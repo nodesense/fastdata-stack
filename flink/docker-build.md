@@ -1,0 +1,1 @@
+docker build -t flink:test -f Dockerfile .

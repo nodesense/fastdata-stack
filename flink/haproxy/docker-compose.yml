@@ -1,0 +1,16 @@
+version: "2.2"
+
+services:
+  haproxy:
+    image: haproxy:test
+    restart: always
+    networks:
+      - docker-compose_flink_zoo_net
+    env_file:
+      - haproxy.env
+    ports:
+      - "8181:80"
+      - "8404:8404"
+networks:
+  docker-compose_flink_zoo_net:
+    external: true
