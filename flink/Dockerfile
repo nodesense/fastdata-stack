@@ -27,4 +27,4 @@ RUN python -m pip install apache-flink==1.15.1
 
 ADD ./code /opt/flink/code
 
-COPY mount/jars/* /opt/flink/lib
+COPY mount/jars/* /opt/flink/lib/
