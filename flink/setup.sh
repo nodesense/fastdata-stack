@@ -4,12 +4,9 @@ docker build -t flink:test -f ./Dockerfile .
 
 
 mkdir -p mount/ha
-mkdir -p mount/code
 mkdir -p mount/jars
-
-
-chmod -R 777 mount/
-chown -R 777 mount/
+ 
+sudo chown -R 777 mount/
 
 cd haproxy
 

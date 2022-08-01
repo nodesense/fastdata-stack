@@ -54,7 +54,7 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
       - ZOO_SERVERS=zookeeper:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
   broker:
-    image: confluentinc/cp-kafka:5.5.5
+    image: confluentinc/cp-kafka:7.0.1
     container_name: broker
     ports:
     # To learn about configuring Kafka for access across networks see
@@ -68,14 +68,12 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-    volumes:
-      - "brokerdata:/var/lib/kafka/data"
   schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.5
+    image: confluentinc/cp-schema-registry:7.0.1
     container_name: schema-registry
     ports:
     # To learn about configuring Kafka for access across networks see
@@ -94,8 +92,8 @@ services:
   jobmanager:
     image: flink:test
     ports:
-      - "8181:8081"
-    #scale: 1
+      - "8081"
+    scale: 2
     depends_on:
       - zookeeper
       - zookeeper2
@@ -107,6 +105,7 @@ services:
       - flink_zoo_net
     volumes:
       - ${FLINK_HA}:/opt/flink/ha
+      - ${FLINK_CODE}:/opt/flink/code
       - ${FLINK_JAR}:/opt/flink/jars
     environment:
       - |
@@ -130,16 +129,15 @@ services:
     command: taskmanager
     networks:
       - flink_zoo_net
-    scale: 1
+    scale: 2
     volumes:
       - ${FLINK_HA}:/opt/flink/ha
+      - ${FLINK_CODE}:/opt/flink/code
       - ${FLINK_JAR}:/opt/flink/jars
-      - /opt/hadoop-2.7.7:/opt/hadoop-2.7.7
-      - /opt/confluent-5.5.5:/opt/confluent-5.5.5
     environment:
       - |
         FLINK_PROPERTIES=
-        taskmanager.numberOfTaskSlots: 8
+        taskmanager.numberOfTaskSlots: 2
         parallelism.default: 2 
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
@@ -147,10 +145,20 @@ services:
         high-availability.storageDir: file:///opt/flink/ha
         high-availability.zookeeper.quorum: zookeeper:2181,zookeeper2:2181,zookeeper3:2181 
         zookeeper.sasl.disable: true
-      - JAVA_HOME=/usr/local/openjdk-11  
-      - HADOOP_HOME=/opt/hadoop-2.7.7
-      - CLASSPATH=/opt/hadoop-2.7.7/lib/*
-      - HADOOP_CLASSPATH=/opt/hadoop-2.7.7/etc/hadoop:/opt/hadoop-2.7.7/share/hadoop/common/lib/*:/opt/hadoop-2.7.7/share/hadoop/common/*:/opt/hadoop-2.7.7/share/hadoop/hdfs:/opt/hadoop-2.7.7/share/hadoop/hdfs/lib/*:/opt/hadoop-2.7.7/share/hadoop/hdfs/*:/opt/hadoop-2.7.7/share/hadoop/yarn/lib/*:/opt/hadoop-2.7.7/share/hadoop/yarn/*:/opt/hadoop-2.7.7/share/hadoop/mapreduce/lib/*:/opt/hadoop-2.7.7/share/hadoop/mapreduce/*:/opt/hadoop-2.7.7/contrib/capacity-scheduler/*.jar
+  haproxy:
+    image: haproxy:test
+    restart: always
+    depends_on:
+      - jobmanager
+    networks:
+      - flink_zoo_net
+    volumes:
+      - ${HAPROXY_CFG}:/usr/local/etc/haproxy/haproxy.cfg
+    env_file:
+      - haproxy.env
+    ports:
+      - "8181:80"
+      - "8404:8404"
   mysql:
     image: mysql
     container_name: mysql
@@ -247,6 +255,3 @@ volumes:
     driver: local
   datanode:
     driver: local
-  brokerdata:
-    driver: local
-    
