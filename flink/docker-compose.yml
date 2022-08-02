@@ -5,6 +5,8 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer2
     restart: unless-stopped
+    # password admin@123
+    command: --admin-password ${PORTAINER_PASSWORD}
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -13,6 +15,8 @@ services:
       - ${PORTAINER_DATA}:/data
     ports:
       - 9999:9000
+
+      
 
   zookeeper:
     image: bitnami/zookeeper:3.8
