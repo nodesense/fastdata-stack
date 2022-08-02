@@ -55,6 +55,7 @@ services:
       - ZOO_SERVERS=zookeeper:2888:3888,zookeeper2:2888:3888,zookeeper3:2888:3888
   broker:
     image: confluentinc/cp-kafka:5.5.5
+    restart: always
     container_name: broker
     ports:
     # To learn about configuring Kafka for access across networks see
@@ -64,9 +65,11 @@ services:
       - flink_zoo_net
     depends_on:
       - zookeeper
+      - zookeeper2
+      - zookeeper3
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181,zookeeper2:2181,zookeeper3:2181'
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -76,6 +79,7 @@ services:
       - "brokerdata:/var/lib/kafka/data"
   schema-registry:
     image: confluentinc/cp-schema-registry:5.5.5
+    restart: always
     container_name: schema-registry
     ports:
     # To learn about configuring Kafka for access across networks see
@@ -85,46 +89,89 @@ services:
       - flink_zoo_net
     depends_on:
       - zookeeper
+      - zookeeper2
+      - zookeeper3
       - broker
     environment:
        SCHEMA_REGISTRY_HOST_NAME: schema-registry
        SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
        SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://broker:29092
        SCHEMA_REGISTRY_MASTER_ELIGIBILITY: "true"
-  jobmanager:
+  jobmanager-1:
     image: flink:test
+    restart: always
+    container_name: jobmanager-1
     ports:
-      - "8181:8081"
-    #scale: 1
+      - "8182:8081"
+    #scale: 2
     depends_on:
       - zookeeper
       - zookeeper2
       - zookeeper3
+      - datanode
+      - namenode
     # networks:
     #   - zookeeper_zoo_net
     command: jobmanager
     networks:
       - flink_zoo_net
     volumes:
-      - ${FLINK_HA}:/opt/flink/ha
       - ${FLINK_JAR}:/opt/flink/jars
     environment:
       - |
         FLINK_PROPERTIES=
         parallelism.default: 2
+        jobmanager.rpc.address: jobmanager-1
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
         high-availability.cluster-id: /cluster_one
-        high-availability.storageDir: file:///opt/flink/ha
+        high-availability.storageDir: hdfs://namenode:9000/flink/recovery
         high-availability.zookeeper.quorum: zookeeper:2181,zookeeper2:2181,zookeeper3:2181   
-        zookeeper.sasl.disable: true    
-  taskmanager:
+        zookeeper.sasl.disable: true
+        cluster.evenly-spread-out-slots: true
+
+  jobmanager-2:
     image: flink:test
+    restart: always
+    container_name: jobmanager-2
+    ports:
+      - "8183:8081"
+    #scale: 2
     depends_on:
-      - jobmanager
       - zookeeper
       - zookeeper2
       - zookeeper3
+      - datanode
+      - namenode
+    # networks:
+    #   - zookeeper_zoo_net
+    command: jobmanager
+    networks:
+      - flink_zoo_net
+    volumes:
+      - ${FLINK_JAR}:/opt/flink/jars
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        parallelism.default: 2
+        jobmanager.rpc.address: jobmanager-2
+        high-availability: zookeeper
+        high-availability.zookeeper.path.root: /flink
+        high-availability.cluster-id: /cluster_one
+        high-availability.storageDir: hdfs://namenode:9000/flink/recovery
+        high-availability.zookeeper.quorum: zookeeper:2181,zookeeper2:2181,zookeeper3:2181   
+        zookeeper.sasl.disable: true    
+        cluster.evenly-spread-out-slots: true
+  taskmanager:
+    image: flink:test
+    depends_on:
+      - jobmanager-1
+      - jobmanager-2
+      - zookeeper
+      - zookeeper2
+      - zookeeper3
+      - datanode
+      - namenode
     # networks:
     #   - zookeeper_zoo_net
     command: taskmanager
@@ -132,8 +179,6 @@ services:
       - flink_zoo_net
     scale: 4
     volumes:
-      - ${FLINK_NFS}:/nfs
-      - ${FLINK_HA}:/opt/flink/ha
       - ${FLINK_JAR}:/opt/flink/jars
       - /opt/hadoop-2.7.7:/opt/hadoop-2.7.7
       - /opt/confluent-5.5.5:/opt/confluent-5.5.5
@@ -145,7 +190,7 @@ services:
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
         high-availability.cluster-id: /cluster_one
-        high-availability.storageDir: file:///opt/flink/ha
+        high-availability.storageDir: hdfs://namenode:9000/flink/recovery
         high-availability.zookeeper.quorum: zookeeper:2181,zookeeper2:2181,zookeeper3:2181 
         zookeeper.sasl.disable: true
       - JAVA_HOME=/usr/local/openjdk-11  
@@ -234,6 +279,22 @@ services:
     ports:
       - "5432"
   
+  haproxy:
+    image: haproxy:2.3
+    restart: always
+    depends_on:
+      - jobmanager-1
+      - jobmanager-2
+    networks:
+      - flink_zoo_net
+    volumes:
+      - ${HAPROXY_CFG}:/usr/local/etc/haproxy/haproxy.cfg
+    env_file:
+      - haproxy.env
+    ports:
+      - "8181:8181"
+      - "8404:8404"
+
 networks:
   flink_zoo_net:
     driver: "bridge"
