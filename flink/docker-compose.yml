@@ -130,8 +130,9 @@ services:
     command: taskmanager
     networks:
       - flink_zoo_net
-    scale: 1
+    scale: 2
     volumes:
+      - ${FLINK_NFS}:/nfs
       - ${FLINK_HA}:/opt/flink/ha
       - ${FLINK_JAR}:/opt/flink/jars
       - /opt/hadoop-2.7.7:/opt/hadoop-2.7.7

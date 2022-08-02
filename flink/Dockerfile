@@ -25,6 +25,6 @@ RUN python3 -m venv /opt/pyflink && \
 
 RUN python -m pip install apache-flink==1.15.1
 
-# COPY mount/jars/* /opt/flink/lib/
+COPY mount/jars/* /opt/flink/lib/
 
 RUN apt-get update && apt-get install -y iputils-ping
