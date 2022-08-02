@@ -130,7 +130,7 @@ services:
     command: taskmanager
     networks:
       - flink_zoo_net
-    scale: 2
+    scale: 4
     volumes:
       - ${FLINK_NFS}:/nfs
       - ${FLINK_HA}:/opt/flink/ha
@@ -140,7 +140,7 @@ services:
     environment:
       - |
         FLINK_PROPERTIES=
-        taskmanager.numberOfTaskSlots: 8
+        taskmanager.numberOfTaskSlots: 16
         parallelism.default: 2 
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
