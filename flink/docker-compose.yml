@@ -5,18 +5,14 @@ services:
     image: portainer/portainer-ce:latest
     container_name: portainer2
     restart: unless-stopped
-    # password admin@123
-    command: --admin-password ${PORTAINER_PASSWORD}
     security_opt:
       - no-new-privileges:true
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${PORTAINER_DATA}:/data
+      - portainer_compose_data:/data
     ports:
       - 9999:9000
-
-      
 
   zookeeper:
     image: bitnami/zookeeper:3.8
@@ -107,6 +103,8 @@ services:
     container_name: jobmanager-1
     ports:
       - "8182:8081"
+    expose:
+      - "6123"
     #scale: 2
     depends_on:
       - zookeeper
@@ -140,6 +138,8 @@ services:
     container_name: jobmanager-2
     ports:
       - "8183:8081"
+    expose:
+      - "6123"
     #scale: 2
     depends_on:
       - zookeeper
@@ -181,11 +181,12 @@ services:
     command: taskmanager
     networks:
       - flink_zoo_net
-    scale: 4
+    scale: 1
     volumes:
       - ${FLINK_JAR}:/opt/flink/jars
       - /opt/hadoop-2.7.7:/opt/hadoop-2.7.7
       - /opt/confluent-5.5.5:/opt/confluent-5.5.5
+      - ./hive-conf:/opt/hive-conf
     environment:
       - |
         FLINK_PROPERTIES=
@@ -199,7 +200,7 @@ services:
         zookeeper.sasl.disable: true
       - JAVA_HOME=/usr/local/openjdk-11  
       - HADOOP_HOME=/opt/hadoop-2.7.7
-      - CLASSPATH=/opt/hadoop-2.7.7/lib/*
+      - CLASSPATH=/opt/hadoop-2.7.7/lib/*:/opt/flink/lib/*
       - HADOOP_CLASSPATH=/opt/hadoop-2.7.7/etc/hadoop:/opt/hadoop-2.7.7/share/hadoop/common/lib/*:/opt/hadoop-2.7.7/share/hadoop/common/*:/opt/hadoop-2.7.7/share/hadoop/hdfs:/opt/hadoop-2.7.7/share/hadoop/hdfs/lib/*:/opt/hadoop-2.7.7/share/hadoop/hdfs/*:/opt/hadoop-2.7.7/share/hadoop/yarn/lib/*:/opt/hadoop-2.7.7/share/hadoop/yarn/*:/opt/hadoop-2.7.7/share/hadoop/mapreduce/lib/*:/opt/hadoop-2.7.7/share/hadoop/mapreduce/*:/opt/hadoop-2.7.7/contrib/capacity-scheduler/*.jar
   mysql:
     image: mysql
@@ -315,4 +316,5 @@ volumes:
     driver: local
   brokerdata:
     driver: local
-    
+  portainer_compose_data:
+    driver: local

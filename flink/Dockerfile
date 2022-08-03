@@ -24,7 +24,9 @@ RUN python3 -m venv /opt/pyflink && \
     pip3 install pyflink
 
 RUN python -m pip install apache-flink==1.15.1
+RUN apt-get update && apt-get install -y iputils-ping
+
+RUN cp -r /opt/flink/opt/flink-table-planner_2.12-1.15.1.jar  /opt/flink/lib/
+RUN mv /opt/flink/lib/flink-table-planner-loader-1.15.1.jar /opt/flink/opt
 
 COPY mount/jars/* /opt/flink/lib/
-
-RUN apt-get update && apt-get install -y iputils-ping
