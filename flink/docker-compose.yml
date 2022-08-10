@@ -1,18 +1,6 @@
 version: "2.2"
 
 services:
-  portainer2:
-    image: portainer/portainer-ce:latest
-    container_name: portainer2
-    restart: unless-stopped
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - portainer_compose_data:/data
-    ports:
-      - 9999:9000
 
   zookeeper:
     image: bitnami/zookeeper:3.8
@@ -315,6 +303,4 @@ volumes:
   datanode:
     driver: local
   brokerdata:
-    driver: local
-  portainer_compose_data:
     driver: local
