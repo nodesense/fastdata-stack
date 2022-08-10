@@ -6,3 +6,14 @@ wget  -P mount/jars  https://repo1.maven.org/maven2/org/apache/flink/flink-table
 
 wget  -P mount/jars https://repo1.maven.org/maven2/org/apache/flink/flink-connector-hive_2.12/1.15.1/flink-connector-hive_2.12-1.15.1.jar
 wget  -P mount/jars https://repo1.maven.org/maven2/org/apache/hive/hive-exec/2.3.6/hive-exec-2.3.6.jar
+
+wget  -P mount/jars https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/1.15.1/flink-sql-connector-kafka-1.15.1.jar
+
+wget  -P mount/jars https://repo1.maven.org/maven2/org/apache/flink/flink-parquet/1.15.1/flink-parquet-1.15.1.jar
+
+
+wget  -P mount/jars https://repo1.maven.org/maven2/org/apache/flink/flink-orc/1.15.1/flink-orc-1.15.1.jar
+
+
+
+
