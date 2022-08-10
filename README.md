@@ -38,7 +38,14 @@ create a data folder and run
 cd flink 
 
 mkdir -p mount/jars
- 
+
+mkdir -p mount/data
+
+wget  -P mount/data  https://files.grouplens.org/datasets/movielens/ml-latest-small.zip
+
+unzip mount/data/ml-latest-small.zip -d mount/data/
+
+
 sudo chmod -R 777 mount/
 
 sudo chown -R 777 mount/
