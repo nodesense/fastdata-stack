@@ -89,6 +89,7 @@ services:
     image: flink:test
     restart: always
     container_name: jobmanager-1
+    hostname: jobmanager
     ports:
       - "8182:8081"
     expose:
@@ -102,7 +103,7 @@ services:
       - namenode
     # networks:
     #   - zookeeper_zoo_net
-    command: jobmanager
+    command: ["jobmanager","jobmanager"]
     networks:
       - flink_zoo_net
     volumes:
@@ -111,7 +112,6 @@ services:
       - |
         FLINK_PROPERTIES=
         parallelism.default: 2
-        jobmanager.rpc.address: jobmanager-1
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
         high-availability.cluster-id: /cluster_one
@@ -124,6 +124,7 @@ services:
     image: flink:test
     restart: always
     container_name: jobmanager-2
+    hostname: jobmanager
     ports:
       - "8183:8081"
     expose:
@@ -137,7 +138,7 @@ services:
       - namenode
     # networks:
     #   - zookeeper_zoo_net
-    command: jobmanager
+    command: ["jobmanager","jobmanager"]
     networks:
       - flink_zoo_net
     volumes:
@@ -146,7 +147,6 @@ services:
       - |
         FLINK_PROPERTIES=
         parallelism.default: 2
-        jobmanager.rpc.address: jobmanager-2
         high-availability: zookeeper
         high-availability.zookeeper.path.root: /flink
         high-availability.cluster-id: /cluster_one
