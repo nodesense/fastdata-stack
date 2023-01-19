@@ -1,4 +1,4 @@
 mount
 flink/mount
 node_modules
-data
+.pyc
