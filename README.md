@@ -1,3 +1,27 @@
+# Host File Mapping
+
+```
+sudo nano /etc/hosts
+```
+
+
+```
+127.0.0.1  broker
+127.0.0.1  schema-registry
+127.0.0.1  datanode
+127.0.0.1  namenode
+127.0.0.1  hive-metastore
+
+```
+
+Save File  Ctrl + O   to Write
+
+Then Enter
+
+Then Ctrl + X to exit
+
+
+
 # Download from one drive
 
 https://gopalakrishnan-my.sharepoint.com/:f:/g/personal/gs_training_sh/EgrMKreM6AxEhtN45wEneOMBdxOBxxcKRpWar9luvVjSHg?e=wMiwWP
@@ -19,10 +43,10 @@ docker run -d -p 8000:8000 -p 9443:9443 --name portainer2x \
 
 ```
 
-Open portainer in https://localhost:9443 and add security exception for https.
+Open portainer in https://localhost:9443 and add security exception for https in the browser
 
 Create user name: admin
-Password: Passwordwith12 chars
+Password: admin@123
 
 ```
 
