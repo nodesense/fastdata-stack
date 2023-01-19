@@ -4,7 +4,7 @@ docker build -t flink:test -f ./Dockerfile .
 
 
 mkdir -p mount/nfs
-
+mkdir -p mount/data
 
 mkdir -p mount/ha
 mkdir -p mount/jars

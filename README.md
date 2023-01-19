@@ -14,6 +14,11 @@ sudo nano /etc/hosts
 
 ```
 
+```
+pip install apache-flink==1.15.3
+pip install pytz pyarrow 
+```
+
 Save File  Ctrl + O   to Write
 
 Then Enter
@@ -164,5 +169,12 @@ hdfs dfs -ls  ml-latest-small hdfs://namenode:9000/ml-latest-small
 
 
 
+
+```
+
+```
+hdfs dfs -put /data hdfs://namenode:9000/
+hdfs dfs -ls hdfs://namenode:9000/
+hdfs dfs -ls hdfs://namenode:9000/data/
 
 ```
