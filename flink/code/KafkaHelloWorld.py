@@ -12,7 +12,8 @@ from pyflink.datastream.connectors import FlinkKafkaConsumer,FlinkKafkaProducer
 from pyflink.common.serialization import SimpleStringSchema, SerializationSchema,JsonRowSerializationSchema,Encoder
 from pyflink.common.typeinfo import Types
 import json
-
+from pyflink.common import Configuration
+# https://nightlies.apache.org/flink/flink-docs-master/docs/dev/python/python_config/
 #wget  -P $FLINK_HOME/lib https://repo1.maven.org/maven2/org/apache/flink/flink-sql-connector-kafka/1.15.3/flink-sql-connector-kafka-1.15.3.jar
 
 #     kafka-topics  --create --bootstrap-server broker:9092 --replication-factor 1 --partitions 3 --topic sensor-data
@@ -22,10 +23,14 @@ import json
 
 # {"tag": "sensor1", "value": 32.3}
 # {"tag": "sensor2", "value": 34.3}
+#config = Configuration()
+#config.set_integer("python.fn-execution.bundle.size", 1000)
+
+#python.executable
 
 env = StreamExecutionEnvironment.get_execution_environment()
-#env.enable_checkpointing(1000 * 10) # 1 sec
-#env.getCheckpointConfig().setCheckpointStorage("hdfs://namenode:9000/checkpoints-data")
+env.enable_checkpointing(1000 * 10) # 1 sec
+env.get_checkpoint_config().set_checkpoint_storage_dir("hdfs://namenode:9000/checkpoints-data")
 
 
 # the sql connector for kafka is used here as it's a fat jar and could avoid dependency issues

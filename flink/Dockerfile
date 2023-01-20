@@ -3,6 +3,8 @@ RUN apt-get update && apt-get install -y iputils-ping
 
 
 ENV PYFLINK_CLIENT_EXECUTABLE="/opt/pyflink/bin/python"
+
+ENV PYTHONPATH="/opt/pyflink/bin/python"
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
 RUN apt-get update

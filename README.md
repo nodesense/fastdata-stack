@@ -1,3 +1,12 @@
+# Git checkout
+
+```
+git clone https://github.com/nodesense/fastdata-stack
+cd fastdata-stack
+
+```
+
+
 # Change default port for local instance
 
 listen on port 8081 default change to other by 
@@ -30,7 +39,6 @@ sudo nano /etc/hosts
 
 ```
 pip install apache-flink==1.15.3
-pip install pytz pyarrow 
 ```
 
 Save File  Ctrl + O   to Write
