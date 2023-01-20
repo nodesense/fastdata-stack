@@ -38,6 +38,8 @@ RUN chmod -R 777 /opt/pyflink
 RUN chmod -R 777 /opt/pyflink/bin
 RUN chmod  777 /opt/pyflink/bin/python
 
+RUN chown -R flink:flink /opt/pyflink
+
 # RUN ln -s /root/miniconda3/bin/python /usr/bin/python
 # RUN chmod  777 /usr/bin/python
 
