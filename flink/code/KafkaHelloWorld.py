@@ -18,12 +18,15 @@ import json
 #     kafka-topics  --create --bootstrap-server broker:9092 --replication-factor 1 --partitions 3 --topic sensor-data
 #     kafka-console-producer --bootstrap-server broker:9092 --topic sensor-data
 #  $FLINK_HOME/bin/flink  run -m localhost:8181 -py /home/training/fastdata-stack/flink/code/KafkaHelloWorld.py
+#  $FLINK_HOME/bin/flink  run -m localhost:8282 -py /home/training/fastdata-stack/flink/code/KafkaHelloWorld.py
 
 # {"tag": "sensor1", "value": 32.3}
 # {"tag": "sensor2", "value": 34.3}
 
 env = StreamExecutionEnvironment.get_execution_environment()
-# env.enable_checkpointing(1000) # 1 sec
+#env.enable_checkpointing(1000 * 10) # 1 sec
+#env.getCheckpointConfig().setCheckpointStorage("hdfs://namenode:9000/checkpoints-data")
+
 
 # the sql connector for kafka is used here as it's a fat jar and could avoid dependency issues
 # env.add_jars("file:///opt/flink-1.15.0/lib/flink-sql-connector-kafka-1.15.0.jar")

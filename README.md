@@ -1,3 +1,17 @@
+# Change default port for local instance
+
+listen on port 8081 default change to other by 
+
+```
+nano $FLINK_HOME/conf/flink-conf.yaml 
+```
+
+
+```
+rest.port: 8282
+```
+
+
 # Host File Mapping
 
 ```

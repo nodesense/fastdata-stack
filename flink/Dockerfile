@@ -2,7 +2,6 @@ FROM flink:1.15.3-scala_2.12-java11
 RUN apt-get update && apt-get install -y iputils-ping
 
 
-
 ENV PYFLINK_CLIENT_EXECUTABLE="/opt/pyflink/bin/python"
 ENV PATH="/root/miniconda3/bin:${PATH}"
 ARG PATH="/root/miniconda3/bin:${PATH}"
